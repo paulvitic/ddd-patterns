@@ -21,6 +21,7 @@
         <module>query-service</module>
         <module>read-model</module>
         <module>port-adapter</module>
+        <module>event-sourcing</module>
     </modules>
 
     <properties>
@@ -41,5 +42,17 @@
         <jacoco.plugin.version>0.7.9</jacoco.plugin.version>
         <dependency-versions-check.plugin.version>2.0.4</dependency-versions-check.plugin.version>
     </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
 
 </project>

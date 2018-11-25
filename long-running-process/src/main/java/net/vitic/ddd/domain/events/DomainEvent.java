@@ -12,5 +12,5 @@ public interface DomainEvent {
 
     String type();
 
-    boolean local();
+    boolean isLocal();
 }

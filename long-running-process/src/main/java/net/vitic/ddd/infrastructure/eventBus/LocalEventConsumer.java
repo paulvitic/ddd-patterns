@@ -16,14 +16,14 @@ import java.util.function.Consumer;
 
 @Component
 @Slf4j
-public class LocalEventPublisher implements Consumer<FluxSink<DomainEvent>> {
+public class LocalEventConsumer implements Consumer<FluxSink<DomainEvent>> {
 
-    private TaskExecutor asyncExecutor;
+    private final TaskExecutor asyncExecutor;
     private final BlockingQueue<DomainEvent> queue = new LinkedBlockingQueue<>();
-    private AtomicBoolean isConsuming = new AtomicBoolean(true);
+    private final AtomicBoolean isConsuming = new AtomicBoolean(true);
 
     @Autowired
-    LocalEventPublisher(TaskExecutor asyncExecutor) {
+    LocalEventConsumer(TaskExecutor asyncExecutor) {
         this.asyncExecutor = asyncExecutor;
     }
 

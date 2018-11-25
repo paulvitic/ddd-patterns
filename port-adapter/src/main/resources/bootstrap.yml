@@ -1,0 +1,62 @@
+spring:
+
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.security.servlet.SecurityAutoConfiguration
+
+  cloud:
+    config:
+      enabled: false
+    stream:
+      bindings:
+        eventOutput:
+          destination: phone.number
+        eventInput:
+          destination: phone.number
+          group: phoneProcesors
+          consumer:
+            concurrency: 3
+      rabbit:
+        bindings:
+          eventInput:
+            consumer:
+              exchangeDurable: true
+
+  rabbitmq:
+    host: rabbitmq.docker.localhost
+    port: 5672
+    username: guest
+    password: guest
+
+  datasource:
+    driverClassName: org.h2.Driver
+    url: jdbc:h2:file:./target/tmp/h2/long-running-process
+    #url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
+    username: sa
+    password:
+
+  jpa:
+    generateDdl: false
+    showSql: false
+    hibernate:
+      ddlAuto: none
+
+  flyway:
+    enabled: true
+    url: jdbc:h2:file:./target/tmp/h2/long-running-process
+    # url: jdbc:h2:mem:db;DB_CLOSE_DELAY=-1
+    locations: classpath:/db/migration
+    user: sa
+    password:
+    cleanDisabled: false
+
+eureka:
+  client:
+    enabled: false
+
+server:
+  port: 8888
+
+logging:
+  level:
+    org.hibernate.SQL: off
+

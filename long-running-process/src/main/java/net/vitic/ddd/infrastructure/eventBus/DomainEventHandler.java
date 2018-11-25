@@ -22,8 +22,8 @@ import java.util.function.Consumer;
 public class DomainEventHandler implements Consumer<DomainEvent>{
 
     private final Map<String, Set<PhoneNumberProcessor>> processorsMap;
-    private final ApplicationEventPublisher applicationEventPublisher;
-    private final LocalEventPublisher localEventPublisher;
+    private final ApplicationEventPublisher localEventPublisher;
+    private final LocalEventConsumer localEventConsumer;
     private final EventSource eventSource;
     private final List<PhoneNumberProcessor> processors;
 
@@ -31,12 +31,12 @@ public class DomainEventHandler implements Consumer<DomainEvent>{
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     public DomainEventHandler(ApplicationEventPublisher applicationEventPublisher,
-                              LocalEventPublisher localEventPublisher,
+                              LocalEventConsumer localEventConsumer,
                               EventSource eventSource,
                               List<PhoneNumberProcessor> processors) {
         this.processorsMap = new HashMap<>();
-        this.applicationEventPublisher = applicationEventPublisher;
-        this.localEventPublisher = localEventPublisher;
+        this.localEventPublisher = applicationEventPublisher;
+        this.localEventConsumer = localEventConsumer;
         this.eventSource = eventSource;
 
         this.processors = processors;
@@ -50,7 +50,7 @@ public class DomainEventHandler implements Consumer<DomainEvent>{
             .flatMap(event -> Flux.fromIterable(processorsMap.get(event.type()))
                                         .map(processor -> processor.process(event)))
             .filter(Optional::isPresent)
-            .doOnNext(event -> this.send((DomainEvent) event.get()))
+            .doOnNext(event -> this.publish((DomainEvent) event.get()))
             .subscribe();
 	}
 
@@ -61,7 +61,7 @@ public class DomainEventHandler implements Consumer<DomainEvent>{
         Flux.fromIterable(processorsMap.get(event.type()))
             .map(processor -> processor.process(event))
             .filter(Optional::isPresent)
-            .doOnNext(result -> this.send((DomainEvent) result.get()))
+            .doOnNext(result -> this.publish((DomainEvent) result.get()))
             .doOnError(this::handleError)
             .subscribe();
     }
@@ -72,9 +72,9 @@ public class DomainEventHandler implements Consumer<DomainEvent>{
     }
 
 
-    private void send(DomainEvent event){
-        if (event.local()) {
-            applicationEventPublisher.publishEvent(event);
+    private void publish(DomainEvent event){
+        if (event.isLocal()) {
+            localEventPublisher.publishEvent(event);
         } else {
             eventSource.output().send(MessageBuilder
                                           .withPayload(event)
@@ -95,7 +95,7 @@ public class DomainEventHandler implements Consumer<DomainEvent>{
         }));
 
         // create flux from spring application event consumer and subscribe to it
-        Flux.create(localEventPublisher)
+        Flux.create(localEventConsumer)
             .subscribe(this);
     }
 }

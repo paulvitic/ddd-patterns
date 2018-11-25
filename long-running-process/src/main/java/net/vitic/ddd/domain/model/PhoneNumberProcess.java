@@ -8,6 +8,9 @@ import javax.persistence.Id;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * This is a process tracker entity
+ */
 @Entity
 public class PhoneNumberProcess extends AbstractAggregateRoot {
 

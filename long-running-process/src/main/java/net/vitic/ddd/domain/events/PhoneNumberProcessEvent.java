@@ -56,7 +56,7 @@ public abstract class PhoneNumberProcessEvent implements DomainEvent {
     }
 
     @Override
-    public boolean local() {
+    public boolean isLocal() {
         return this.local;
     }
 }
