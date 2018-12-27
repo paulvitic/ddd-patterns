@@ -1,8 +1,8 @@
 package net.vitic.ddd.infrastructure.eventBus;
 
 import lombok.extern.slf4j.Slf4j;
-import net.vitic.ddd.domain.events.DomainEvent;
-import net.vitic.ddd.domain.events.PhoneNumberProcessEvent;
+import net.vitic.ddd.domain.event.DomainEvent;
+import net.vitic.ddd.domain.event.PhoneNumberProcessEvent;
 import net.vitic.ddd.domain.service.PhoneNumberProcessor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
@@ -50,7 +50,7 @@ public class DomainEventHandler implements Consumer<DomainEvent>{
             .flatMap(event -> Flux.fromIterable(processorsMap.get(event.type()))
                                         .map(processor -> processor.process(event)))
             .filter(Optional::isPresent)
-            .doOnNext(event -> this.publish((DomainEvent) event.get()))
+            .doOnNext(event -> this.publish((PhoneNumberProcessEvent) event.get()))
             .subscribe();
 	}
 
@@ -61,7 +61,7 @@ public class DomainEventHandler implements Consumer<DomainEvent>{
         Flux.fromIterable(processorsMap.get(event.type()))
             .map(processor -> processor.process(event))
             .filter(Optional::isPresent)
-            .doOnNext(result -> this.publish((DomainEvent) result.get()))
+            .doOnNext(result -> this.publish((PhoneNumberProcessEvent) result.get()))
             .doOnError(this::handleError)
             .subscribe();
     }
@@ -72,14 +72,14 @@ public class DomainEventHandler implements Consumer<DomainEvent>{
     }
 
 
-    private void publish(DomainEvent event){
+    private void publish(PhoneNumberProcessEvent event){
         if (event.isLocal()) {
             localEventPublisher.publishEvent(event);
         } else {
             eventSource.output().send(MessageBuilder
                                           .withPayload(event)
                                           .setHeader("type", event.getClass().getName())
-                                          .setHeader("messageId", event.processId())
+                                          .setHeader("messageId", event.aggregateId())
                                           .build());
         }
     }
@@ -87,14 +87,14 @@ public class DomainEventHandler implements Consumer<DomainEvent>{
 
     @PostConstruct
     void init(){
-        // populate processors map
+        //populate processors map
         //noinspection unchecked
         processors.forEach(processor -> processor.handles().forEach(type -> {
             processorsMap.computeIfAbsent((String) type, k -> new HashSet<>());
             processorsMap.get(type).add(processor);
         }));
 
-        // create flux from spring application event consumer and subscribe to it
+        //create flux from spring application event consumer and subscribe to it
         Flux.create(localEventConsumer)
             .subscribe(this);
     }

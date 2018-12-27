@@ -1,6 +1,6 @@
 package net.vitic.ddd.domain.service;
 
-import net.vitic.ddd.domain.events.DomainEvent;
+import net.vitic.ddd.domain.event.DomainEvent;
 
 import java.util.List;
 import java.util.Optional;

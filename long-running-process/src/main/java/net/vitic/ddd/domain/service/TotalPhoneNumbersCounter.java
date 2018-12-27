@@ -1,9 +1,9 @@
 package net.vitic.ddd.domain.service;
 
 import lombok.extern.slf4j.Slf4j;
-import net.vitic.ddd.domain.events.AllPhoneNumbersCounted;
-import net.vitic.ddd.domain.events.AllPhoneNumbersListed;
-import net.vitic.ddd.domain.events.DomainEvent;
+import net.vitic.ddd.domain.event.AllPhoneNumbersCounted;
+import net.vitic.ddd.domain.event.AllPhoneNumbersListed;
+import net.vitic.ddd.domain.event.DomainEvent;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -24,7 +24,7 @@ public class TotalPhoneNumbersCounter implements PhoneNumberProcessor<AllPhoneNu
         String[] allPhoneNumbersToCount = allPhoneNumbers.split("\n");
 
         DomainEvent newEvent = new AllPhoneNumbersCounted(
-            event.processId(),
+            event.aggregateId(),
             allPhoneNumbersToCount.length);
 
         return Optional.of(newEvent);

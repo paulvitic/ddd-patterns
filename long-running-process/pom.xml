@@ -13,6 +13,11 @@
     </parent>
 
     <dependencies>
+        <dependency>
+            <groupId>net.vitic</groupId>
+            <artifactId>ddd-patterns-common</artifactId>
+            <version>${project.version}</version>
+        </dependency>
         <!-- ================================= -->
         <!-- Spring Boot                       -->
         <!-- ================================= -->

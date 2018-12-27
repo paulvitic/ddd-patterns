@@ -1,10 +1,10 @@
 package net.vitic.ddd.domain.service;
 
 import lombok.extern.slf4j.Slf4j;
-import net.vitic.ddd.domain.events.MatchedPhoneNumbersCounted;
-import net.vitic.ddd.domain.events.AllPhoneNumbersCounted;
-import net.vitic.ddd.domain.events.DomainEvent;
-import net.vitic.ddd.domain.model.repository.PhoneNumberProcessRepo;
+import net.vitic.ddd.domain.event.MatchedPhoneNumbersCounted;
+import net.vitic.ddd.domain.event.AllPhoneNumbersCounted;
+import net.vitic.ddd.domain.event.DomainEvent;
+import net.vitic.ddd.model.repository.PhoneNumberProcessRepo;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -26,7 +26,7 @@ public class PhoneNumberExecutive implements PhoneNumberProcessor<DomainEvent> {
     @Transactional
     public Optional<DomainEvent> process(DomainEvent event) {
 
-        this.repo.processOfId(event.processId())
+        this.repo.processOfId(event.aggregateId())
                  .ifPresent(process -> {
 
                      if (event.type().equals(AllPhoneNumbersCounted.class.getName())) {

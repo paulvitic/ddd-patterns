@@ -17,6 +17,7 @@
     <packaging>pom</packaging>
 
     <modules>
+        <module>ddd-patterns-common</module>
         <module>long-running-process</module>
         <module>query-service</module>
         <module>read-model</module>

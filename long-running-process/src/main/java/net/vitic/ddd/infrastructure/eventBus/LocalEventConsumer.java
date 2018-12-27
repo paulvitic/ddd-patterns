@@ -1,7 +1,7 @@
 package net.vitic.ddd.infrastructure.eventBus;
 
 import lombok.extern.slf4j.Slf4j;
-import net.vitic.ddd.domain.events.DomainEvent;
+import net.vitic.ddd.domain.event.DomainEvent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.task.TaskExecutor;
