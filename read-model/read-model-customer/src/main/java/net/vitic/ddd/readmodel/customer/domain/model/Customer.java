@@ -4,19 +4,20 @@ import lombok.Builder;
 import lombok.NonNull;
 import net.vitic.ddd.domain.model.AggregateRoot;
 import net.vitic.ddd.readmodel.customer.domain.event.CustomerCreated;
-import net.vitic.ddd.util.JpaIdGenerator;
+import net.vitic.ddd.util.EntityIdGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
 
 @Entity
-@IdClass(value = JpaIdGenerator.class)
 public class Customer extends AggregateRoot {
 
     public enum Status {ACTIVE, DELETED}
 
     @Id
-    private Long id;
+    @Basic(optional = false)
+    @Column(name = "id")
+    private String id;
 
     @Version
     private Integer version;
@@ -36,14 +37,15 @@ public class Customer extends AggregateRoot {
     private Customer(@NonNull String firstName,
                      @NonNull String lastName,
                      @NonNull Date dateOfBirth) {
+        this.id = EntityIdGenerator.generate();
+        this.status = Status.ACTIVE;
         this.firstName = firstName;
         this.lastName = lastName;
         this.dateOfBirth = dateOfBirth;
-        this.status = Status.ACTIVE;
-        registerEvent(new CustomerCreated(Long.toString(this.id),
-                                          this.firstName,
-                                          this.lastName,
-                                          this.dateOfBirth));
+        registerEvent(new CustomerCreated(this.id(),
+                                          this.firstName(),
+                                          this.lastName(),
+                                          this.dateOfBirth()));
     }
 
     public static Customer create(String firstName,
@@ -56,7 +58,7 @@ public class Customer extends AggregateRoot {
                        .build();
     }
 
-    public Long id() {
+    public String id() {
         return this.id;
     }
 

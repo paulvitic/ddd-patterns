@@ -15,7 +15,7 @@ public class CustomerCreated implements DomainEvent {
 
     @Override
     public String type() {
-        return this.getClass().getName();
+        return this.getClass().getSimpleName();
     }
 
     @Override
