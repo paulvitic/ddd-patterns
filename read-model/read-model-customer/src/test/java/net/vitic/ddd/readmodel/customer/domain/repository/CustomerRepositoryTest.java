@@ -49,42 +49,41 @@ class CustomerRepositoryTest {
     void should_save_customer() {
 
         String firstName = "firstName";
-        final Behavior behavior = Behavior.given(
-            "a first name " + firstName);
+        final Behavior behavior = Behavior.given("a first name {}", firstName);
 
         String lastName = "lastName";
-        behavior.andGiven("and a last name " + lastName);
+        behavior.andGiven("and a last name {}.", lastName);
 
         Date dateOfBirth = new Date();
-        behavior.andGiven("and a birth date " + dateOfBirth);
+        behavior.andGiven("and a birth date {}.", dateOfBirth);
 
         behavior.when("a customer is created with these parameters");
         Customer customer = Customer.create(firstName, lastName, dateOfBirth);
 
-        behavior.andWhen("and it is saved");
+        behavior.andWhen("and it is saved.");
         customerRepository.save(customer);
 
-        behavior.then("a single domain event should be generated");
+        behavior.then("a single domain event should be generated.");
         assertEquals(1, domainEventListener.getDomainEvents().size(), behavior.fail());
 
-        behavior.andThen("type of domain event should be " + CustomerCreated.class.getSimpleName());
+        behavior.andThen("type of domain event should be {}.", CustomerCreated.class.getSimpleName());
         assertEquals(CustomerCreated.class.getSimpleName(),
                      domainEventListener.getDomainEvents().get(0).type(), behavior.fail());
 
-        behavior.andThen("saved customer should be retrievable from repository by id " + customer.id());
+        behavior.andThen("saved customer should be retrievable from repository by id {}.", customer.id());
         Optional<Customer> saved = customerRepository.findById(customer.id());
         assertTrue(saved.isPresent(), behavior.fail());
 
-        behavior.andThen("and it's status should be " + Customer.Status.ACTIVE);
+        behavior.andThen("and it's status should be {}.", Customer.Status.ACTIVE);
         assertEquals(Customer.Status.ACTIVE, saved.get().status(), behavior.fail());
 
-        behavior.andThen("and it's first name should be " + firstName);
+        behavior.andThen("and it's first name should be {}.", firstName);
         assertEquals(firstName, saved.get().firstName(), behavior.fail());
 
-        behavior.andThen("and it's last name should be " + lastName);
+        behavior.andThen("and it's last name should be {}.", lastName);
         assertEquals(lastName, saved.get().lastName(), behavior.fail());
 
-        behavior.andThen("and it's birth date should be " + dateOfBirth);
+        behavior.andThen("and it's birth date should be {}.", dateOfBirth);
         assertEquals(dateOfBirth.getTime(), saved.get().dateOfBirth().getTime(), behavior.fail());
 
         log.info(behavior.success());

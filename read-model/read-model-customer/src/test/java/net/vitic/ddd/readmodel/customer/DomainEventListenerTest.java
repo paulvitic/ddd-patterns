@@ -1,7 +1,6 @@
 package net.vitic.ddd.readmodel.customer;
 
 import net.vitic.ddd.domain.event.DomainEvent;
-import org.springframework.boot.test.context.TestComponent;
 import org.springframework.context.event.EventListener;
 
 import java.util.ArrayList;

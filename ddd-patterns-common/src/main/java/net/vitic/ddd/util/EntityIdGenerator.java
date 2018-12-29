@@ -13,4 +13,10 @@ public class EntityIdGenerator {
                 "-" +
                 UUID.randomUUID().toString().toUpperCase().substring(0, 8);
     }
+
+    public static String generate(){
+        return new SimpleDateFormat("yyMMdd").format(new Date()) +
+               "-" +
+               UUID.randomUUID().toString().toUpperCase().substring(0, 8);
+    }
 }
