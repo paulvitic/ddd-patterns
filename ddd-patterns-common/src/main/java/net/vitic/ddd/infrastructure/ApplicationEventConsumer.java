@@ -1,4 +1,4 @@
-package net.vitic.ddd.infrastructure.eventBus;
+package net.vitic.ddd.infrastructure;
 
 import lombok.extern.slf4j.Slf4j;
 import net.vitic.ddd.domain.event.DomainEvent;
@@ -16,14 +16,14 @@ import java.util.function.Consumer;
 
 @Component
 @Slf4j
-public class LocalEventConsumer implements Consumer<FluxSink<DomainEvent>> {
+public class ApplicationEventConsumer implements Consumer<FluxSink<DomainEvent>> {
 
     private final TaskExecutor asyncExecutor;
     private final BlockingQueue<DomainEvent> queue = new LinkedBlockingQueue<>();
     private final AtomicBoolean isConsuming = new AtomicBoolean(true);
 
     @Autowired
-    LocalEventConsumer(TaskExecutor asyncExecutor) {
+    ApplicationEventConsumer(TaskExecutor asyncExecutor) {
         this.asyncExecutor = asyncExecutor;
     }
 
@@ -47,8 +47,7 @@ public class LocalEventConsumer implements Consumer<FluxSink<DomainEvent>> {
 
                 } catch (InterruptedException e) {
                     sink.error(e);
-                    // See: https://grokonez.com/reactive-programming/reactor/reactor-handle-error
-                    //ReflectionUtils.rethrowRuntimeException(e);
+                    log.error("Exception while consuming application event", e);
                 }
             }
 

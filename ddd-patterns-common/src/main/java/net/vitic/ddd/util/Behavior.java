@@ -8,67 +8,77 @@ import java.util.Map;
 @SuppressWarnings("UnusedReturnValue")
 public class Behavior {
 
-    private final List<String> givens = new ArrayList<>();
-    private final List<String> whens = new ArrayList<>();
-    private final List<String> thens = new ArrayList<>();
+    private static final ThreadLocal<Behavior> behaviorContext = new ThreadLocal<>();
+
+    private final List<String> given = new ArrayList<>();
+    private final List<String> when = new ArrayList<>();
+    private final List<String> then = new ArrayList<>();
 
     private Behavior(String given, Object... args) {
-        givens.add(arrayFormat(given, args));
+        this.given.add(arrayFormat(given, args));
     }
 
-    public static Behavior given(String given, Object... args) {
-        return new Behavior(given, args);
+    public static void given(String msg, Object... args) {
+        behaviorContext.set(new Behavior(msg, args));
     }
 
-    public Behavior andGiven(String given, Object... args) {
-        givens.add(arrayFormat(given, args));
-        return this;
-    }
-
-
-    public Behavior when(String when, Object... args) {
-        this.whens.add(arrayFormat(when, args));
-        return this;
+    public static void andGiven(String msg, Object... args) {
+        behaviorContext.get().given.add(arrayFormat(msg, args));
     }
 
 
-    public Behavior andWhen(String when, Object... args) {
-        this.whens.add(arrayFormat(when, args));
-        return this;
+    public static void when(String msg, Object... args) {
+        behaviorContext.get().when.add(arrayFormat(msg, args));
     }
 
 
-    public Behavior then(String then, Object... args) {
-        this.thens.add(arrayFormat(then, args));
-        return this;
+    public static void andWhen(String msg, Object... args) {
+        behaviorContext.get().when.add(arrayFormat(msg, args));
     }
 
 
-    public Behavior andThen(String then, Object... args) {
-        this.thens.add(arrayFormat(then, args));
-        return this;
+    public static void then(String msg, Object... args) {
+        behaviorContext.get().then.add(arrayFormat(msg, args));
     }
 
 
-    public String success(){
-        return ("\n" +
-
-                (char) 27 +
-
-                "[32m==========\n") +
-
-                "SUCCESS\n" +
-
-                "==========\n" +
-
-                this.givenWhenThen() +
-
-                (char) 27 + "[0m";
+    public static void andThen(String msg, Object... args) {
+        behaviorContext.get().then.add(arrayFormat(msg, args));
     }
 
 
-    public String fail(){
-        return ("\n" + (char) 27 +
+    public static void success(){
+        if (behaviorContext.get()==null) {
+            System.out.print((char) 27 +
+                             "[35mNo behavior context found. Test result will not be printed." +
+                             (char) 27 + "[0m");
+        } else {
+            String res =  ("\n" +
+
+                           (char) 27 +
+
+                           "[32m==========\n") +
+
+                          "SUCCESS\n" +
+
+                          "==========\n" +
+
+                          givenWhenThen() +
+
+                          (char) 27 + "[0m";
+
+            System.out.print(res);
+        }
+    }
+
+
+    public static String fail(){
+        if (behaviorContext.get()==null) {
+            return ((char) 27 +
+                    "[35mNo behavior context found. Test result will not be printed." +
+                    (char) 27 + "[0m");
+        } else {
+            return ("\n" + (char) 27 +
 
                 "[31m==========\n") +
 
@@ -76,32 +86,33 @@ public class Behavior {
 
                 "==========\n" +
 
-                this.givenWhenThen() +
+                givenWhenThen() +
 
                 (char) 27 + "[0m";
+        }
     }
 
 
-    private String givenWhenThen() {
+    private static String givenWhenThen() {
 
         final StringBuilder builder = new StringBuilder();
 
         builder.append("given:\n");
 
-        givens.forEach(given -> builder
+        behaviorContext.get().given.forEach(given -> builder
                 .append("\t")
                 .append(given)
                 .append("\n"));
 
         builder.append("when:\n");
 
-        whens.forEach(when -> builder
+        behaviorContext.get().when.forEach(when -> builder
                 .append("\t")
                 .append(when)
                 .append("\n"));
         builder.append("then:\n");
 
-        thens.forEach(then -> builder
+        behaviorContext.get().then.forEach(then -> builder
                 .append("\t")
                 .append(then)
                 .append("\n"));
@@ -109,7 +120,7 @@ public class Behavior {
         return builder.toString();
     }
 
-    private String arrayFormat(String messagePattern, Object[] argArray) {
+    private static String arrayFormat(String messagePattern, Object[] argArray) {
         if (messagePattern == null) {
             return null;
         } else if (argArray == null) {
@@ -152,7 +163,7 @@ public class Behavior {
         }
     }
 
-    private boolean isEscapedDelimeter(String messagePattern, int delimeterStartIndex) {
+    private static boolean isEscapedDelimeter(String messagePattern, int delimeterStartIndex) {
         if (delimeterStartIndex == 0) {
             return false;
         } else {
@@ -161,11 +172,11 @@ public class Behavior {
         }
     }
 
-    private boolean isDoubleEscaped(String messagePattern, int delimeterStartIndex) {
+    private static boolean isDoubleEscaped(String messagePattern, int delimeterStartIndex) {
         return delimeterStartIndex >= 2 && messagePattern.charAt(delimeterStartIndex - 2) == '\\';
     }
 
-    private void deeplyAppendParameter(StringBuffer sbuf, Object o, Map seenMap) {
+    private static void deeplyAppendParameter(StringBuffer sbuf, Object o, Map seenMap) {
         if (o == null) {
             sbuf.append("null");
         } else {
@@ -194,7 +205,7 @@ public class Behavior {
         }
     }
 
-    private void safeObjectAppend(StringBuffer sbuf, Object o) {
+    private static void safeObjectAppend(StringBuffer sbuf, Object o) {
         try {
             String oAsString = o.toString();
             sbuf.append(oAsString);
@@ -206,7 +217,7 @@ public class Behavior {
 
     }
 
-    private void objectArrayAppend(StringBuffer sbuf, Object[] a, Map seenMap) {
+    private static void objectArrayAppend(StringBuffer sbuf, Object[] a, Map seenMap) {
         sbuf.append('[');
         if (!seenMap.containsKey(a)) {
             //noinspection unchecked
@@ -228,7 +239,7 @@ public class Behavior {
         sbuf.append(']');
     }
 
-    private void booleanArrayAppend(StringBuffer sbuf, boolean[] a) {
+    private static void booleanArrayAppend(StringBuffer sbuf, boolean[] a) {
         sbuf.append('[');
         int len = a.length;
 
@@ -242,7 +253,7 @@ public class Behavior {
         sbuf.append(']');
     }
 
-    private void byteArrayAppend(StringBuffer sbuf, byte[] a) {
+    private static void byteArrayAppend(StringBuffer sbuf, byte[] a) {
         sbuf.append('[');
         int len = a.length;
 
@@ -256,7 +267,7 @@ public class Behavior {
         sbuf.append(']');
     }
 
-    private void charArrayAppend(StringBuffer sbuf, char[] a) {
+    private static void charArrayAppend(StringBuffer sbuf, char[] a) {
         sbuf.append('[');
         int len = a.length;
 
@@ -270,7 +281,7 @@ public class Behavior {
         sbuf.append(']');
     }
 
-    private void shortArrayAppend(StringBuffer sbuf, short[] a) {
+    private static void shortArrayAppend(StringBuffer sbuf, short[] a) {
         sbuf.append('[');
         int len = a.length;
 
@@ -284,7 +295,7 @@ public class Behavior {
         sbuf.append(']');
     }
 
-    private void intArrayAppend(StringBuffer sbuf, int[] a) {
+    private static void intArrayAppend(StringBuffer sbuf, int[] a) {
         sbuf.append('[');
         int len = a.length;
 
@@ -298,7 +309,7 @@ public class Behavior {
         sbuf.append(']');
     }
 
-    private void longArrayAppend(StringBuffer sbuf, long[] a) {
+    private static void longArrayAppend(StringBuffer sbuf, long[] a) {
         sbuf.append('[');
         int len = a.length;
 
@@ -312,7 +323,7 @@ public class Behavior {
         sbuf.append(']');
     }
 
-    private void floatArrayAppend(StringBuffer sbuf, float[] a) {
+    private static void floatArrayAppend(StringBuffer sbuf, float[] a) {
         sbuf.append('[');
         int len = a.length;
 
@@ -326,7 +337,7 @@ public class Behavior {
         sbuf.append(']');
     }
 
-    private void doubleArrayAppend(StringBuffer sbuf, double[] a) {
+    private static void doubleArrayAppend(StringBuffer sbuf, double[] a) {
         sbuf.append('[');
         int len = a.length;
 

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import net.vitic.ddd.domain.event.DomainEvent;
 import net.vitic.ddd.domain.event.PhoneNumberProcessEvent;
 import net.vitic.ddd.domain.service.PhoneNumberProcessor;
+import net.vitic.ddd.infrastructure.ApplicationEventConsumer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;
@@ -23,7 +24,7 @@ public class DomainEventHandler implements Consumer<DomainEvent>{
 
     private final Map<String, Set<PhoneNumberProcessor>> processorsMap;
     private final ApplicationEventPublisher localEventPublisher;
-    private final LocalEventConsumer localEventConsumer;
+    private final ApplicationEventConsumer applicationEventConsumer;
     private final EventSource eventSource;
     private final List<PhoneNumberProcessor> processors;
 
@@ -31,12 +32,12 @@ public class DomainEventHandler implements Consumer<DomainEvent>{
     @SuppressWarnings("SpringJavaInjectionPointsAutowiringInspection")
     @Autowired
     public DomainEventHandler(ApplicationEventPublisher applicationEventPublisher,
-                              LocalEventConsumer localEventConsumer,
+                              ApplicationEventConsumer applicationEventConsumer,
                               EventSource eventSource,
                               List<PhoneNumberProcessor> processors) {
         this.processorsMap = new HashMap<>();
         this.localEventPublisher = applicationEventPublisher;
-        this.localEventConsumer = localEventConsumer;
+        this.applicationEventConsumer = applicationEventConsumer;
         this.eventSource = eventSource;
 
         this.processors = processors;
@@ -95,7 +96,7 @@ public class DomainEventHandler implements Consumer<DomainEvent>{
         }));
 
         //create flux from spring application event consumer and subscribe to it
-        Flux.create(localEventConsumer)
+        Flux.create(applicationEventConsumer)
             .subscribe(this);
     }
 }

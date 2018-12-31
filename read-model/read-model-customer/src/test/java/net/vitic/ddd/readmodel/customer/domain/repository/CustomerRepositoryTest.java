@@ -1,30 +1,26 @@
 package net.vitic.ddd.readmodel.customer.domain.repository;
 
-import lombok.extern.slf4j.Slf4j;
 import net.vitic.ddd.readmodel.customer.DomainEventListenerTest;
 import net.vitic.ddd.readmodel.customer.domain.event.CustomerCreated;
 import net.vitic.ddd.readmodel.customer.domain.model.Customer;
-import net.vitic.ddd.util.Behavior;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
 import java.util.Optional;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static net.vitic.ddd.readmodel.ReadModelTestFixtures.*;
+import static net.vitic.ddd.util.Behavior.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-@Slf4j
 @ExtendWith(SpringExtension.class)
-@SpringBootTest
 @DataJpaTest
 @Transactional
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_EACH_TEST_METHOD)
@@ -46,46 +42,67 @@ class CustomerRepositoryTest {
     DomainEventListenerTest domainEventListener;
 
     @Test
+    void should_not_find_non_existing_customer(){
+        given("non-existing customer {}", CUSTOMER_ID);
+
+        when("it is searched in repository");
+        Optional<Customer> res = customerRepository.findById(CUSTOMER_ID);
+
+        then("result should be emty");
+        assertFalse(res.isPresent(), fail());
+
+        success();
+    }
+
+    @Test
     void should_save_customer() {
 
-        String firstName = "firstName";
-        final Behavior behavior = Behavior.given("a first name {}", firstName);
+        given("first name {}, and last name {}, and birth date {}",
+              CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, CUSTOMER_BIRTH_DATE);
 
-        String lastName = "lastName";
-        behavior.andGiven("and a last name {}.", lastName);
 
-        Date dateOfBirth = new Date();
-        behavior.andGiven("and a birth date {}.", dateOfBirth);
-
-        behavior.when("a customer is created with these parameters");
-        Customer customer = Customer.create(firstName, lastName, dateOfBirth);
-
-        behavior.andWhen("and it is saved.");
+        when("a customer is created, and it is saved");
+        Customer customer = Customer.create(CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, CUSTOMER_BIRTH_DATE);
         customerRepository.save(customer);
 
-        behavior.then("a single domain event should be generated.");
-        assertEquals(1, domainEventListener.getDomainEvents().size(), behavior.fail());
 
-        behavior.andThen("type of domain event should be {}.", CustomerCreated.class.getSimpleName());
+        then("a single domain event should be generated");
+        assertEquals(1, domainEventListener.getDomainEvents().size(), fail());
+
+        andThen("type of domain event should be {}", CustomerCreated.class.getSimpleName());
         assertEquals(CustomerCreated.class.getSimpleName(),
-                     domainEventListener.getDomainEvents().get(0).type(), behavior.fail());
+                     domainEventListener.getDomainEvents().get(0).type(), fail());
 
-        behavior.andThen("saved customer should be retrievable from repository by id {}.", customer.id());
+        andThen("saved customer should be retrievable from repository by {}", customer.id());
         Optional<Customer> saved = customerRepository.findById(customer.id());
-        assertTrue(saved.isPresent(), behavior.fail());
+        assertTrue(saved.isPresent(), fail());
 
-        behavior.andThen("and it's status should be {}.", Customer.Status.ACTIVE);
-        assertEquals(Customer.Status.ACTIVE, saved.get().status(), behavior.fail());
+        andThen("and it's status should be {}", Customer.Status.ACTIVE);
+        assertEquals(Customer.Status.ACTIVE, saved.get().status(), fail());
 
-        behavior.andThen("and it's first name should be {}.", firstName);
-        assertEquals(firstName, saved.get().firstName(), behavior.fail());
+        andThen("and it's first name should be {}", CUSTOMER_FIRST_NAME);
+        assertEquals(CUSTOMER_FIRST_NAME, saved.get().firstName(), fail());
 
-        behavior.andThen("and it's last name should be {}.", lastName);
-        assertEquals(lastName, saved.get().lastName(), behavior.fail());
+        andThen("and it's last name should be {}", CUSTOMER_LAST_NAME);
+        assertEquals(CUSTOMER_LAST_NAME, saved.get().lastName(), fail());
 
-        behavior.andThen("and it's birth date should be {}.", dateOfBirth);
-        assertEquals(dateOfBirth.getTime(), saved.get().dateOfBirth().getTime(), behavior.fail());
+        andThen("and it's birth date should be {}", CUSTOMER_BIRTH_DATE);
+        assertEquals(CUSTOMER_BIRTH_DATE.getTime(), saved.get().dateOfBirth().getTime(), fail());
 
-        log.info(behavior.success());
+        success();
+    }
+
+    @Test
+    void should_not_delete_non_existing_customer(){
+        given("non-existing customer {}", CUSTOMER_ID);
+        Customer customer = Customer.create(CUSTOMER_FIRST_NAME, CUSTOMER_LAST_NAME, CUSTOMER_BIRTH_DATE);
+        //customerRepository.save(customer);
+
+        when("it is deleted");
+
+        then("{} should be thrown", EmptyResultDataAccessException.class.getSimpleName());
+        assertThrows(EmptyResultDataAccessException.class, () -> customerRepository.deleteById(CUSTOMER_ID), fail());
+
+        success();
     }
 }
