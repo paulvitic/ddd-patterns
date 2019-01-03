@@ -16,7 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
-import static net.vitic.ddd.readmodel.ReadModelTestFixtures.*;
+import static net.vitic.ddd.readmodel.customer.ReadModelCustomerFixtures.*;
 import static net.vitic.ddd.util.Behavior.*;
 import static org.junit.jupiter.api.Assertions.*;
 

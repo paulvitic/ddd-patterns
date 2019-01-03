@@ -50,7 +50,7 @@ public class Behavior {
     public static void success(){
         if (behaviorContext.get()==null) {
             System.out.print((char) 27 +
-                             "[35mNo behavior context found. Test result will not be printed." +
+                             "[35mBehavior context not found. Test result will not be printed." +
                              (char) 27 + "[0m");
         } else {
             String res =  ("\n" +
@@ -75,7 +75,7 @@ public class Behavior {
     public static String fail(){
         if (behaviorContext.get()==null) {
             return ((char) 27 +
-                    "[35mNo behavior context found. Test result will not be printed." +
+                    "[35mBehavior context not found. Test result will not be printed." +
                     (char) 27 + "[0m");
         } else {
             return ("\n" + (char) 27 +

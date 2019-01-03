@@ -2,17 +2,20 @@ package net.vitic.ddd.readmodel.customer.domain.model;
 
 import lombok.Builder;
 import lombok.NonNull;
+import lombok.extern.slf4j.Slf4j;
 import net.vitic.ddd.domain.model.AggregateRoot;
 import net.vitic.ddd.readmodel.customer.domain.event.CustomerCreated;
+import net.vitic.ddd.readmodel.customer.domain.event.CustomerFirstNameUpdated;
 import net.vitic.ddd.util.EntityIdGenerator;
 
 import javax.persistence.*;
 import java.util.Date;
 
+@Slf4j
 @Entity
 public class Customer extends AggregateRoot {
 
-    public enum Status {ACTIVE, DELETED}
+    public enum Status {ACTIVE, SUSPENDED, DELETED}
 
     @Id
     @Basic(optional = false)
@@ -77,4 +80,15 @@ public class Customer extends AggregateRoot {
     public Status status() {
         return status;
     }
+
+    public void updateFirstName(String firstName){
+        if (firstName.equals(this.firstName())) {
+            log.warn("Customer {} first name is already {}. Will not update.",
+                     this.id(), this.firstName());
+        } else {
+            this.firstName = firstName;
+            registerEvent(new CustomerFirstNameUpdated(this.id(), this.firstName()));
+        }
+    }
+
 }

@@ -9,5 +9,3 @@ CREATE TABLE customer (
 
 CREATE INDEX customer_status_index
   ON customer(status);
-
--- indexes?
