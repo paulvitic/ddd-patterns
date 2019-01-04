@@ -2,7 +2,7 @@ package net.vitic.ddd.readmodel.customerorder.port.adapter.message;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.vitic.ddd.domain.customerorder.model.CustomerOrder;
+import net.vitic.ddd.readmodel.customerorder.domain.model.CustomerOrder;
 import net.vitic.ddd.domain.event.DomainEvent;
 import org.springframework.cloud.stream.annotation.EnableBinding;
 import org.springframework.cloud.stream.annotation.StreamListener;

@@ -2,7 +2,6 @@ package net.vitic.ddd.readmodel.customerorder.domain.model;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
-import lombok.Builder;
 
 import javax.persistence.Entity;
 import java.util.HashSet;

@@ -51,11 +51,7 @@ class DomainEventProducerTest {
 
         Behavior.when("customer created event is published");
         when(eventSource.output()).thenReturn(messageChannel);
-        applicationEventPublisher.publishEvent(
-            new CustomerCreated(CUSTOMER_ID,
-                                CUSTOMER_FIRST_NAME,
-                                CUSTOMER_LAST_NAME,
-                                CUSTOMER_BIRTH_DATE));
+        applicationEventPublisher.publishEvent(customerCreatedEvent());
 
         await().atLeast(Duration.ONE_SECOND);
 
@@ -66,6 +62,9 @@ class DomainEventProducerTest {
                         Objects.equals(message.getHeaders().get(DomainEventProducer.MSG_HEADER_EVENT_TYPE), CustomerCreated.class.getName() + ":0") &&
                         message.getPayload().getClass().getName().equals(CustomerCreated.class.getName()) &&
                         ((CustomerCreated) message.getPayload()).getFirstName().equals(CUSTOMER_FIRST_NAME)));
+
+        applicationEventConsumer.preStop();
+        await().until(() -> applicationEventConsumer.isStopped());
 
         Behavior.success();
     }

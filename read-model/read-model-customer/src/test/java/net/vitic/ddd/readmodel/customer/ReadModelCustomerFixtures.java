@@ -1,5 +1,7 @@
 package net.vitic.ddd.readmodel.customer;
 
+import net.vitic.ddd.readmodel.customer.domain.event.CustomerCreated;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -17,5 +19,12 @@ public class ReadModelCustomerFixtures {
         } catch (ParseException e) {
             e.printStackTrace();
         }
+    }
+
+    public static CustomerCreated customerCreatedEvent(){
+        return new CustomerCreated(CUSTOMER_ID,
+                            CUSTOMER_FIRST_NAME,
+                            CUSTOMER_LAST_NAME,
+                            CUSTOMER_BIRTH_DATE);
     }
 }

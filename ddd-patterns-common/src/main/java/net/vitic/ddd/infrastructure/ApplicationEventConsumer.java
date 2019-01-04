@@ -37,6 +37,10 @@ public class ApplicationEventConsumer implements Consumer<FluxSink<DomainEvent>>
         isConsuming.set(false);
     }
 
+    public boolean isStopped(){
+        return !isConsuming.get();
+    }
+
     @Override
     public void accept(FluxSink<DomainEvent> sink) {
         this.asyncExecutor.execute(() -> {
