@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import net.vitic.ddd.model.PhoneNumberProcess;
 
 import java.util.Date;
 
@@ -43,6 +44,11 @@ public abstract class PhoneNumberProcessEvent implements DomainEvent {
     @Override
     public int version() {
         return this.eventVersion;
+    }
+
+    @Override
+    public String aggregate() {
+        return PhoneNumberProcess.class.getName();
     }
 
     @Override

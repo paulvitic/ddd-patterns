@@ -8,9 +8,13 @@ public interface DomainEvent {
 
     int version();
 
+    String aggregate();
+
     String aggregateId();
 
     Date occurredOn();
 
     Long sequence();
+
+    boolean isLocal();
 }

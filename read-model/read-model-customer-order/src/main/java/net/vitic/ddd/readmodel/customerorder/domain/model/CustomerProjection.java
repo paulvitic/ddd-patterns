@@ -19,4 +19,8 @@ public class CustomerProjection {
     static CustomerProjection create(String id, String firstName, String lastName){
         return new CustomerProjection(id, firstName, lastName, new HashSet<>());
     }
+
+    public String id(){
+        return this.id;
+    }
 }
