@@ -1,4 +1,4 @@
-package net.vitic.ddd.readmodel.customer;
+package net.vitic.ddd.common;
 
 import net.vitic.ddd.domain.event.DomainEvent;
 import org.springframework.context.event.EventListener;
@@ -6,7 +6,6 @@ import org.springframework.context.event.EventListener;
 import java.util.ArrayList;
 import java.util.List;
 
-//@TestComponent
 public class DomainEventListenerTest {
 
     private List<DomainEvent> domainEvents = new ArrayList<>();

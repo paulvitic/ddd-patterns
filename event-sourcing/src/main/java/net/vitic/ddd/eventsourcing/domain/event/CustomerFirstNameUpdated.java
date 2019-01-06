@@ -1,4 +1,4 @@
-package net.vitic.ddd.readmodel.customer.domain.event;
+package net.vitic.ddd.eventsourcing.domain.event;
 
 import lombok.Value;
 import net.vitic.ddd.domain.event.DomainEvent;
@@ -6,12 +6,10 @@ import net.vitic.ddd.domain.event.DomainEvent;
 import java.util.Date;
 
 @Value
-public class CustomerCreated implements DomainEvent {
+public class CustomerFirstNameUpdated implements DomainEvent {
 
     private final String aggregateId;
     private final String firstName;
-    private final String lastName;
-    private final Date dateOfBirth;
 
     @Override
     public String type() {

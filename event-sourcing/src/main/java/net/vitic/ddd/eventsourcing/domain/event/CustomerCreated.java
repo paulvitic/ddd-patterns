@@ -1,4 +1,4 @@
-package net.vitic.ddd.readmodel.customer.domain.event;
+package net.vitic.ddd.eventsourcing.domain.event;
 
 import lombok.Value;
 import net.vitic.ddd.domain.event.DomainEvent;

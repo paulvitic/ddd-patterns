@@ -37,4 +37,14 @@ public class CustomerSuspended implements DomainEvent {
     public Long sequence() {
         return 0L;
     }
+
+    @Override
+    public String aggregate() {
+        return null;
+    }
+
+    @Override
+    public boolean isLocal() {
+        return false;
+    }
 }

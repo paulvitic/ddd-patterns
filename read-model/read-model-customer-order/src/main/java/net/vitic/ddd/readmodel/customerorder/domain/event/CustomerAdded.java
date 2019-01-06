@@ -37,4 +37,16 @@ public class CustomerAdded implements DomainEvent {
     public String aggregateId() {
         return this.getId();
     }
+
+    @Override
+    public String aggregate() {
+        return null;
+    }
+
+    @Override
+    public boolean isLocal() {
+        return false;
+    }
+
+
 }

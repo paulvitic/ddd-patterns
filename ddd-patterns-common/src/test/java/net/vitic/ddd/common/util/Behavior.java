@@ -1,4 +1,4 @@
-package net.vitic.ddd.util;
+package net.vitic.ddd.common.util;
 
 import java.util.ArrayList;
 import java.util.HashMap;

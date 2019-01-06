@@ -1,9 +1,9 @@
 package net.vitic.ddd.readmodel.customer.port.adapter.message;
 
+import net.vitic.ddd.common.util.Behavior;
 import net.vitic.ddd.config.AsyncConfig;
 import net.vitic.ddd.infrastructure.ApplicationEventConsumer;
 import net.vitic.ddd.readmodel.customer.domain.event.CustomerCreated;
-import net.vitic.ddd.util.Behavior;
 import org.awaitility.Duration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;

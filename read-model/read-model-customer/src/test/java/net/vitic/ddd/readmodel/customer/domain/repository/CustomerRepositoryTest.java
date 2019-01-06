@@ -1,6 +1,6 @@
 package net.vitic.ddd.readmodel.customer.domain.repository;
 
-import net.vitic.ddd.readmodel.customer.DomainEventListenerTest;
+import net.vitic.ddd.common.DomainEventListenerTest;
 import net.vitic.ddd.readmodel.customer.domain.event.CustomerCreated;
 import net.vitic.ddd.readmodel.customer.domain.model.Customer;
 import org.junit.jupiter.api.Test;
@@ -16,8 +16,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Optional;
 
+import static net.vitic.ddd.common.util.Behavior.*;
 import static net.vitic.ddd.readmodel.customer.ReadModelCustomerFixtures.*;
-import static net.vitic.ddd.util.Behavior.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(SpringExtension.class)

@@ -34,4 +34,14 @@ public class CustomerRemoved implements DomainEvent {
     public String aggregateId() {
         return getId();
     }
+
+    @Override
+    public String aggregate() {
+        return null;
+    }
+
+    @Override
+    public boolean isLocal() {
+        return false;
+    }
 }

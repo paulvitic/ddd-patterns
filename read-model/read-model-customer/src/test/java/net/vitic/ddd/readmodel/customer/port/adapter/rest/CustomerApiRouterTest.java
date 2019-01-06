@@ -16,7 +16,7 @@ import org.springframework.test.web.reactive.server.WebTestClient;
 import reactor.core.publisher.Mono;
 
 import static net.vitic.ddd.readmodel.customer.ReadModelCustomerFixtures.*;
-import static net.vitic.ddd.util.Behavior.*;
+import static net.vitic.ddd.common.util.Behavior.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.doThrow;

@@ -1,25 +1,26 @@
 package net.vitic.ddd.eventsourcing.domain;
 
 import net.vitic.ddd.domain.event.DomainEvent;
+import net.vitic.ddd.domain.model.AggregateRoot;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Function;
 
-public interface EventSourced {
+public abstract class EventSourcedAggregate extends AggregateRoot {
 
-    void mutate(DomainEvent event);
+    protected abstract void mutate(DomainEvent event);
 
-    default void reConstruct(List<DomainEvent> events) {
+    protected void reConstruct(List<DomainEvent> events) {
         events.forEach(this::mutate);
     }
 
-    default MutateMethodSelector select() {
+    protected MutateMethodSelector select() {
         return new MutateMethodSelector();
     }
 
-    class MutateMethodSelector {
+    protected class MutateMethodSelector {
 
         private final List<ArgumentClassPattern> patterns = new ArrayList<>();
 
