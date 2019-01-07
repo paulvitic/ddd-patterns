@@ -36,12 +36,29 @@ public class EventStore {
     }
 
     @Transactional(readOnly = true)
-    public List<EventLog> eventsSince(String aggregate,
-                                      String aggregateId,
-                                      long lastSequence) {
+    public List<DomainEvent> aggregateEventsSince(String aggregate,
+                                          String aggregateId,
+                                          long lastSequence) {
         return persistence
                 .findAllByAggregateAndAggregateIdAndSequenceGreaterThanOrderBySequenceAsc(
-                        aggregate, aggregateId, lastSequence);
+                        aggregate, aggregateId, lastSequence)
+                .stream()
+                .map(EventLog::event)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .collect(Collectors.toList());
+    }
+
+    @Transactional(readOnly = true)
+    public List<DomainEvent> aggregateEvents(String aggregate,
+                                          String aggregateId) {
+        return persistence.findAllByAggregateAndAggregateIdOrderBySequenceAsc(
+                aggregate, aggregateId)
+            .stream()
+            .map(EventLog::event)
+            .filter(Optional::isPresent)
+            .map(Optional::get)
+            .collect(Collectors.toList());
     }
 
     /**

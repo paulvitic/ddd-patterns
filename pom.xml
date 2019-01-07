@@ -23,6 +23,7 @@
         <module>read-model</module>
         <module>port-adapter</module>
         <module>event-sourcing</module>
+        <module>domain-service</module>
     </modules>
 
     <properties>

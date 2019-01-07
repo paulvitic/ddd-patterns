@@ -1,6 +1,5 @@
 package net.vitic.ddd.eventsourcing.domain.model;
 
-import lombok.Builder;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import net.vitic.ddd.domain.event.DomainEvent;
@@ -32,31 +31,26 @@ public class Customer extends EventSourcedAggregate {
         this.reConstruct(events);
     }
 
-    @Builder
-    private Customer(@NonNull String firstName,
-                     @NonNull String lastName,
-                     @NonNull Date dateOfBirth) {
-        registerEvent(
-            createCustomerInternal(
-                EntityIdGenerator.generate(),
-                firstName,
-                lastName,
-                dateOfBirth));
+
+    public static DomainEvent create(@NonNull String firstName,
+                                     @NonNull String lastName,
+                                     @NonNull Date dateOfBirth) {
+
+        return new CustomerCreated(EntityIdGenerator.generate(),
+                                   firstName,
+                                   lastName,
+                                   dateOfBirth);
     }
 
-    public static Customer create(String firstName,
-                                  String lastName,
-                                  Date dateOfBirth) {
-        return Customer.builder()
-                       .firstName(firstName)
-                       .lastName(lastName)
-                       .dateOfBirth(dateOfBirth)
-                       .build();
-    }
-
-    public void updateFirstName(String firstName){
-        this.updateFirstNameInternal(firstName)
-            .ifPresent(this::registerEvent);
+    public Optional<DomainEvent> updateFirstName(String firstName){
+        if (firstName.equals(this.firstName())) {
+            log.warn("Customer {} first name is already {}. Will not update.",
+                     this.id(), this.firstName());
+            return Optional.empty();
+        } else {
+            this.firstName = firstName;
+            return Optional.of(new CustomerFirstNameUpdated(this.id(), this.firstName()));
+        }
     }
 
     public String id() {
@@ -88,40 +82,14 @@ public class Customer extends EventSourcedAggregate {
     }
 
     private void customerCreated(CustomerCreated event) {
-        this.createCustomerInternal(event.aggregateId(),
-                                    event.getFirstName(),
-                                    event.getLastName(),
-                                    event.getDateOfBirth());
+        this.id = event.aggregateId();
+        this.status = Status.ACTIVE;
+        this.firstName = event.getFirstName();
+        this.lastName = event.getLastName();
+        this.dateOfBirth = event.getDateOfBirth();
     }
 
     private void customerFirstNameUpdated(CustomerFirstNameUpdated event) {
-        this.updateFirstNameInternal(event.getFirstName());
-    }
-
-
-    private DomainEvent createCustomerInternal(String id,
-                                               String firstName,
-                                               String lastName,
-                                               Date dateOfBirth) {
-        this.id = id;
-        this.status = Status.ACTIVE;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.dateOfBirth = dateOfBirth;
-        return new CustomerCreated(this.id(),
-                                   this.firstName(),
-                                   this.lastName(),
-                                   this.dateOfBirth());
-    }
-
-    private Optional<DomainEvent> updateFirstNameInternal(String firstName) {
-        if (firstName.equals(this.firstName())) {
-            log.warn("Customer {} first name is already {}. Will not update.",
-                     this.id(), this.firstName());
-            return Optional.empty();
-        } else {
-            this.firstName = firstName;
-            return Optional.of(new CustomerFirstNameUpdated(this.id(), this.firstName()));
-        }
+        this.updateFirstName(event.getFirstName());
     }
 }
